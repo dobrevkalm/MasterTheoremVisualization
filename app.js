@@ -20,7 +20,9 @@ const rootY = 30,
 // this will be used to calculate the distance between the nodes
     nodeGap = 1.5;
 
+var allNodes = 0;
 function createNode(x, y1, y2, color, width) {
+    allNodes++;
     return svg.append('line')
         // position on the svg
         .attr('x1', x)
@@ -34,7 +36,7 @@ function createNode(x, y1, y2, color, width) {
         .attr('stroke-width', width);
 }
 
-function drawMergeSort() {
+function getParameters() {
     var N = parseInt(document.getElementById('N').value),
         a = parseInt(document.getElementById('a').value),
         b = parseInt(document.getElementById('b').value),
@@ -52,27 +54,38 @@ function drawMergeSort() {
         return;
     }
 
+    return {
+        "N": N,
+        "a": a,
+        "b": b,
+        "c": c
+    };
+}
+
+function drawMergeSort() {
+    var params = getParameters();
+
     // clear the SVG
     svg.html("");
 
     // draw the root
-    var root = createNode((svg.attr('width'))/2, rootY, rootY + nodeH, color, N);
+    var root = createNode((svg.attr('width'))/2, rootY, rootY + nodeH, color, params.N);
 
     (function drawMergeSortNodes(root, currentLevel = 1) {
         console.log("We start with root -> ", root);
         // calculate the number of levels
-        var levels = Math.log(N) / Math.log(b),
+        var levels = Math.log(params.N) / Math.log(params.b),
         // how many nodes per lvl
-            nodes = a,
+            nodes = params.a,
         // distance between the level nodes
-            nodeDist = Math.pow(nodeGap, levels) * a;
+            nodeDist = Math.pow(nodeGap, levels) * params.a;
             console.log("levels -> ", levels);
         if(currentLevel >= levels) return;
         console.log(currentLevel, levels);
         // draw all the levels
         while (currentLevel < levels) {
             // the width of the node
-            var nodeW = root.attr('stroke-width') / b,
+            var nodeW = root.attr('stroke-width') / params.b,
             // node Y position
                 nodeY = parseInt(root.attr('y2')) + levelDist,
             // node X position
@@ -88,8 +101,9 @@ function drawMergeSort() {
                 currNode++;
             }
             currentLevel++;
-            nodes *= b;
+            nodes *= params.b;
             nodeDist /= nodeGap;
         }
     })(root)
+    console.log("Total nodes: ", allNodes);
 }
