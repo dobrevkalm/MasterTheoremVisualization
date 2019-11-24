@@ -20,9 +20,9 @@ const rootY = 30,
 // this will be used to calculate the distance between the nodes
     nodeGap = 1.5;
 
-var allNodes = 0;
+var totalNodes = 0;
 function createNode(x, y1, y2, color, width) {
-    allNodes++;
+    totalNodes++;
     return svg.append('line')
         // position on the svg
         .attr('x1', x)
@@ -89,14 +89,13 @@ function drawMergeSort() {
             // node Y position
                 nodeY = parseInt(root.attr('y2')) + levelDist,
             // node X position
-            // Here, I have NO IDEA why nodes-4 would work, however, it does... ¯\_(ツ)_/¯
-                nodeX = (svg.attr('width') - (nodes * nodeW + (nodes - 4) * nodeDist)) / 2,
-                currNode = 1;
+                nodeX = svg.attr('width')/2 - ((nodes-1)*nodeW)/2 - ((nodes-1)*nodeDist)/2,
+                currNode = 0;
             console.log("Doing level ", currentLevel, " it has ", nodes, " nodes with nodeWidth: ", nodeW);
             // draw all the nodes per level
-            while (currNode <= nodes) {
+            while (currNode < nodes && totalNodes < params.N) {
                 var node = createNode(nodeX, nodeY, nodeY + nodeH, color, nodeW);
-                if (currNode == 1) root = node;
+                if (currNode == 0) root = node;
                 nodeX += nodeW + nodeDist;
                 currNode++;
             }
@@ -105,5 +104,6 @@ function drawMergeSort() {
             nodeDist /= nodeGap;
         }
     })(root)
-    console.log("Total nodes: ", allNodes);
+    console.log("Total nodes: ", totalNodes);
+    totalNodes = 0;
 }
