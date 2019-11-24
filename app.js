@@ -38,7 +38,19 @@ function drawMergeSort() {
     var N = parseInt(document.getElementById('N').value),
         a = parseInt(document.getElementById('a').value),
         b = parseInt(document.getElementById('b').value),
+        // not yet used
         c = parseInt(document.getElementById('c').value);
+
+    if(isNaN(N) || isNaN(a) || isNaN(b) || isNaN(c)) {
+        alert("Missing parameter!");
+        return;
+    }
+
+    // if b is one then levels below are = to infinity, thus, we loop forever QQ
+    if(b < 2) {
+        alert("Paramether b must be at least 2!");
+        return;
+    }
 
     // clear the SVG
     svg.html("");
@@ -49,16 +61,18 @@ function drawMergeSort() {
     (function drawMergeSortNodes(root, currentLevel = 1) {
         console.log("We start with root -> ", root);
         // calculate the number of levels
-        var levels = Math.log(root.attr('stroke-width')) / Math.log(b),
+        var levels = Math.log(N) / Math.log(b),
         // how many nodes per lvl
             nodes = a,
         // distance between the level nodes
             nodeDist = Math.pow(nodeGap, levels) * a;
             console.log("levels -> ", levels);
+        if(currentLevel >= levels) return;
+        console.log(currentLevel, levels);
         // draw all the levels
         while (currentLevel < levels) {
             // the width of the node
-            var nodeW = root.attr('stroke-width') / 2,
+            var nodeW = root.attr('stroke-width') / b,
             // node Y position
                 nodeY = parseInt(root.attr('y2')) + levelDist,
             // node X position
