@@ -1,14 +1,16 @@
-const svgWidth = window.innerWidth,
-    svgHeight = window.innerHeight;
-
-// the SVG container
 const svg = d3.select('svg')
-    .attr('width', svgWidth)
-    .attr('height', svgHeight)
+// change to window.innerWidth and innerHeight when not testing
+    .attr('width', 800)
+    .attr('height', 600)
     .attr('class', 'svg_container');
 
+(function listenForEnterPress() {
+    document.addEventListener('keypress', e => {
+        if(e.which == 13) drawMergeSort();
+})})();
+
 // root position from top
-const rootY = 50,
+const rootY = 30,
 // node height
     nodeH = 30,
 // distane between tree levels
@@ -17,11 +19,6 @@ const rootY = 50,
     color = '#00008b',
 // this will be used to calculate the distance between the nodes
     nodeGap = 1.5;
-
-// merge sort params
-var a = 2,
-    b = 2,
-    c = 2;
 
 function createNode(x, y1, y2, color, width) {
     return svg.append('line')
@@ -37,24 +34,17 @@ function createNode(x, y1, y2, color, width) {
         .attr('stroke-width', width);
 }
 
-(function listenForEnterPress() {
-    document.addEventListener('keypress', (e) => {
-        if(e.which == 13) drawMergeSort();
-})})();
-
-function draw() {
-    
-}
-
 function drawMergeSort() {
-    var input = document.getElementById('N'),
-        N = parseInt(input.value);
+    var N = parseInt(document.getElementById('N').value),
+        a = parseInt(document.getElementById('a').value),
+        b = parseInt(document.getElementById('b').value),
+        c = parseInt(document.getElementById('c').value);
 
     // clear the SVG
     svg.html("");
 
     // draw the root
-    var root = createNode((svg.attr('width')) / 2, rootY, rootY + nodeH, color, N);
+    var root = createNode((svg.attr('width'))/2, rootY, rootY + nodeH, color, N);
 
     (function drawMergeSortNodes(root, currentLevel = 1) {
         console.log("We start with root -> ", root);
@@ -73,7 +63,7 @@ function drawMergeSort() {
                 nodeY = parseInt(root.attr('y2')) + levelDist,
             // node X position
             // Here, I have NO IDEA why nodes-4 would work, however, it does... ¯\_(ツ)_/¯
-                nodeX = (svgWidth - (nodes * nodeW + (nodes - 4) * nodeDist)) / 2,
+                nodeX = (svg.attr('width') - (nodes * nodeW + (nodes - 4) * nodeDist)) / 2,
                 currNode = 1;
             console.log("Doing level ", currentLevel, " it has ", nodes, " nodes with nodeWidth: ", nodeW);
             // draw all the nodes per level
