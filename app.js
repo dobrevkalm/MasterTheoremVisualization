@@ -1,12 +1,16 @@
 const svg = d3.select('svg')
-// change to window.innerWidth and innerHeight when not testing
+    // use these width and height in dev
     .attr('width', 800)
     .attr('height', 600)
+    // actual width and height
+/*  .attr('width', window.innerWidth)
+    .attr('height', window.innerHeight) */
     .attr('class', 'svg_container');
 
+// allow drowing with enter press
 (function listenForEnterPress() {
     document.addEventListener('keypress', e => {
-        if(e.which == 13) drawMergeSort();
+        if(e.which == 13) drawRecuerenceRelationTree(1);
 })})();
 
 // will brighten up given hex color with given percent
@@ -31,7 +35,13 @@ const rootY = 30,
 // node color
 var defaultColor = "#000050";
 
+// keep track of the total nodes drawn
 var totalNodes = 0;
+
+// has mode 2 been enabled
+var mode2 = true;
+
+// create a single node
 function createNode(x, y1, y2, color, width) {
     totalNodes++;
     return svg.append('line')
@@ -47,6 +57,7 @@ function createNode(x, y1, y2, color, width) {
         .attr('stroke-width', width);
 }
 
+// get the input parameters
 function getParameters() {
     var N = parseInt(document.getElementById('N').value),
         a = parseInt(document.getElementById('a').value),
@@ -54,26 +65,30 @@ function getParameters() {
         // not yet used
         c = parseInt(document.getElementById('c').value);
 
-    if(isNaN(N) || isNaN(a) || isNaN(b) || isNaN(c)) {
-        alert("Missing parameter!");
-        return;
-    }
-
-    // if b is one then levels below are = to infinity, thus, we loop forever QQ
-    if(b < 2) {
-        alert("Paramether b must be at least 2!");
-        return;
-    }
-
-    return {
+    var params = {
         "N": N,
         "a": a,
         "b": b,
         "c": c
-    };
+    }
+
+    for(var i in params) {
+        // make sure we have all parameters
+        if(isNaN(params[i])) {
+            alert("Missing parameter!");
+            return;
+        }
+        // if b is one then levels below are = to infinity
+        if(i === "b" && params[i] < 2) {
+            alert("Parameter b can't be smaller than 2!");
+            return;
+        }
+    }
+
+    return params;
 }
 
-function drawMergeSort() {
+function drawRecuerenceRelationTree(mode) {
     var params = getParameters();
 
     // clear the SVG
@@ -81,41 +96,87 @@ function drawMergeSort() {
 
     // draw the root
     var root = createNode((svg.attr('width'))/2, rootY, rootY + nodeH, defaultColor, params.N);
-
-    (function drawMergeSortNodes(root, currentLevel = 1) {
-        var nodeColor = defaultColor;
-        console.log("We start with root -> ", root);
-        // calculate the number of levels
-        var levels = Math.log(params.N) / Math.log(params.b),
-        // how many nodes per lvl
-            nodes = params.a,
-        // distance between the level nodes
-            nodeDist = Math.pow(nodeGap, levels) * params.a;
-        console.log("levels -> ", levels);
-        // draw all the levels
-        while (currentLevel < levels) {
-            // change node color
-            nodeColor = lightenColor(nodeColor, currentLevel*(20/levels));
-            // the width of the node
-            var nodeW = root.attr('stroke-width') / params.b,
-            // node Y position
-                nodeY = parseInt(root.attr('y2')) + levelDist,
-            // node X position
-                nodeX = svg.attr('width')/2 - ((nodes-1)*nodeW)/2 - ((nodes-1)*nodeDist)/2,
-                currNode = 0;
-            console.log("Doing level ", currentLevel, " it has ", nodes, " nodes with nodeWidth: ", nodeW);
-            // draw all the nodes per level
-            while (currNode < nodes && totalNodes < params.N) {
-                var node = createNode(nodeX, nodeY, nodeY + nodeH, nodeColor, nodeW);
-                if (currNode == 0) root = node;
-                nodeX += nodeW + nodeDist;
-                currNode++;
-            }
-            currentLevel++;
-            nodes *= params.b;
-            nodeDist /= nodeGap;
-        }
-    })(root)
+    
+    // draw the tree nodes
+    drawTreeNodes(root, params, mode);
     console.log("Total nodes: ", totalNodes);
+
+    // reset the total nodes
     totalNodes = 0;
+
+    // enable mode 2
+    if(mode2) initMode2();
+}
+
+function drawTreeNodes(root, params, mode) {
+    // root for the current level
+    var currentRoot = root,
+    // current level
+        currentLevel = 1,
+    // color for the current level
+        nodeColor = defaultColor;
+    console.log("We start with root -> ", root);
+    // calculate the number of levels
+    var levels = Math.log(params.N) / Math.log(params.b),
+    // how many nodes per lvl
+        nodes = params.a,
+    // distance between the level nodes
+        nodeDist = 0;
+    // only mode 1 has distance between the nodes
+    if(mode == 1) nodeDist = Math.pow(nodeGap, levels) * params.a;
+    console.log("levels -> ", levels);
+    // draw all the levels
+    while (currentLevel < levels) {
+        // change node color
+        nodeColor = lightenColor(nodeColor, currentLevel*(20/levels));
+        // the width of the node
+        var nodeW = currentRoot.attr('stroke-width') / params.b,
+        // node Y position
+            nodeY = parseInt(currentRoot.attr('y2')) + levelDist,
+        // node X position
+            nodeX = svg.attr('width')/2 - ((nodes-1)*nodeW)/2,
+            currNode = 0;
+        // keep into account the distance between the nodes for mode 1
+        if(mode == 1) nodeX -= ((nodes-1)*nodeDist)/2;
+        console.log("Doing level ", currentLevel, " it has ", nodes, " nodes with nodeWidth: ", nodeW);
+        // draw all the nodes per level
+        while (currNode < nodes && totalNodes < params.N) {
+            var node = createNode(nodeX, nodeY, nodeY + nodeH, nodeColor, nodeW);
+            if (currNode == 0) currentRoot = node;
+            nodeX += nodeW + nodeDist;
+            currNode++;
+        }
+        currentLevel++;
+        nodes *= params.b;
+        nodeDist /= nodeGap;
+    }
+}
+
+// creates the button for mode 2
+function initMode2(){
+    // set mode2 to false
+    mode2 = false;
+    // container needed to avoid redundant styling
+    var btnContainer = document.createElement('div'),
+        btn = document.createElement('button');
+    // set btn attributes
+    btn.innerText = "Mode 2";
+    btn.id = "m2";
+    // to draw mode 2 on click
+    btn.addEventListener('click', () => {
+        if(btn.innerText === "Mode 2") drawMode2();
+        else {
+            drawRecuerenceRelationTree(1);
+            btn.innerText = "Mode 2";
+        }
+    });
+    // append the button
+    btnContainer.appendChild(btn);
+    document.getElementById('inputContainer').appendChild(btnContainer);
+};
+
+function drawMode2() {
+    var btn = document.getElementById('m2');
+    btn.innerText = "Mode 1";
+    drawRecuerenceRelationTree(2);
 }
