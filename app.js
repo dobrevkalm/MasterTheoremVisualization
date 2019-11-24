@@ -1,10 +1,10 @@
 const svg = d3.select('svg')
     // use these width and height in dev
-    .attr('width', 800)
-    .attr('height', 600)
+    /* .attr('width', 800)
+    .attr('height', 600) */
     // actual width and height
-/*  .attr('width', window.innerWidth)
-    .attr('height', window.innerHeight) */
+    .attr('width', window.innerWidth)
+    .attr('height', window.innerHeight)
     .attr('class', 'svg_container');
 
 // allow drowing with enter press
