@@ -9,16 +9,27 @@ const svg = d3.select('svg')
         if(e.which == 13) drawMergeSort();
 })})();
 
+// will brighten up given hex color with given percent
+function lightenColor(color, percent) {
+    var num = parseInt(color.replace("#", ""), 16),
+        amt = Math.round(2.55 * percent),
+        R = (num >> 16) + amt,
+        B = (num >> 8 & 0x00FF) + amt,
+        G = (num & 0x0000FF) + amt;
+
+    return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
+};
+
 // root position from top
 const rootY = 30,
 // node height
     nodeH = 30,
 // distane between tree levels
     levelDist = 20,
-// node color
-    color = '#00008b',
 // this will be used to calculate the distance between the nodes
     nodeGap = 1.5;
+// node color
+var defaultColor = "#000050";
 
 var totalNodes = 0;
 function createNode(x, y1, y2, color, width) {
@@ -69,9 +80,10 @@ function drawMergeSort() {
     svg.html("");
 
     // draw the root
-    var root = createNode((svg.attr('width'))/2, rootY, rootY + nodeH, color, params.N);
+    var root = createNode((svg.attr('width'))/2, rootY, rootY + nodeH, defaultColor, params.N);
 
     (function drawMergeSortNodes(root, currentLevel = 1) {
+        var nodeColor = defaultColor;
         console.log("We start with root -> ", root);
         // calculate the number of levels
         var levels = Math.log(params.N) / Math.log(params.b),
@@ -79,11 +91,11 @@ function drawMergeSort() {
             nodes = params.a,
         // distance between the level nodes
             nodeDist = Math.pow(nodeGap, levels) * params.a;
-            console.log("levels -> ", levels);
-        if(currentLevel >= levels) return;
-        console.log(currentLevel, levels);
+        console.log("levels -> ", levels);
         // draw all the levels
         while (currentLevel < levels) {
+            // change node color
+            nodeColor = lightenColor(nodeColor, currentLevel*(20/levels));
             // the width of the node
             var nodeW = root.attr('stroke-width') / params.b,
             // node Y position
@@ -94,7 +106,7 @@ function drawMergeSort() {
             console.log("Doing level ", currentLevel, " it has ", nodes, " nodes with nodeWidth: ", nodeW);
             // draw all the nodes per level
             while (currNode < nodes && totalNodes < params.N) {
-                var node = createNode(nodeX, nodeY, nodeY + nodeH, color, nodeW);
+                var node = createNode(nodeX, nodeY, nodeY + nodeH, nodeColor, nodeW);
                 if (currNode == 0) root = node;
                 nodeX += nodeW + nodeDist;
                 currNode++;
