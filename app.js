@@ -1,8 +1,4 @@
 const svg = d3.select('svg')
-    // use these width and height in dev
-    /* .attr('width', 800)
-    .attr('height', 600) */
-    // actual width and height
     .attr('width', window.innerWidth)
     .attr('height', window.innerHeight)
     .attr('class', 'svg_container');
@@ -31,19 +27,16 @@ const rootY = 30,
 // distane between tree levels
     levelDist = 20,
 // this will be used to calculate the distance between the nodes
-    nodeGap = 1.5;
+    nodeGap = 1.2;
+
 // node color
 var defaultColor = "#000050";
-
-// keep track of the total nodes drawn
-var totalNodes = 0;
 
 // has mode 2 been enabled
 var mode2 = true;
 
 // create a single node
 function createNode(x, y1, y2, color, width) {
-    totalNodes++;
     return svg.append('line')
         // position on the svg
         .attr('x1', x)
@@ -99,10 +92,6 @@ function drawRecuerenceRelationTree(mode) {
     
     // draw the tree nodes
     drawTreeNodes(root, params, mode);
-    console.log("Total nodes: ", totalNodes);
-
-    // reset the total nodes
-    totalNodes = 0;
 
     // enable mode 2
     if(mode2) initMode2();
@@ -118,7 +107,7 @@ function drawTreeNodes(root, params, mode) {
     console.log("We start with root -> ", root);
     // calculate the number of levels
     var levels = Math.log(params.N) / Math.log(params.b),
-    // how many nodes per lvl
+    // nodes at the root
         nodes = params.a,
     // distance between the level nodes
         nodeDist = 0;
@@ -140,14 +129,14 @@ function drawTreeNodes(root, params, mode) {
         if(mode == 1) nodeX -= ((nodes-1)*nodeDist)/2;
         console.log("Doing level ", currentLevel, " it has ", nodes, " nodes with nodeWidth: ", nodeW);
         // draw all the nodes per level
-        while (currNode < nodes && totalNodes < params.N) {
+        while (currNode < nodes) {
             var node = createNode(nodeX, nodeY, nodeY + nodeH, nodeColor, nodeW);
             if (currNode == 0) currentRoot = node;
             nodeX += nodeW + nodeDist;
             currNode++;
         }
         currentLevel++;
-        nodes *= params.b;
+        nodes *= params.a;
         nodeDist /= nodeGap;
     }
 }
