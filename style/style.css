@@ -56,5 +56,5 @@ button {
 }
 
 .active {
-    border-bottom: 5px solid rgb(24, 100, 170) !important;
+    border-bottom: 5px solid rgb(24, 100, 170);
 }
