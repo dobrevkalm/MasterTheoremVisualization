@@ -1,8 +1,8 @@
 import TreeLevel from './treeLevel.js';
 
 export default class Tree {
-    constructor(svg, n, a, b, c) {
-        this.svg = svg;
+    constructor(svgWidth, n, a, b, c) {
+        this.svgWidth = svgWidth;
         this.noOfTreeLevels = this.getNoOfTreeLevels(n, b);
         if (this.noOfTreeLevels === -1) return;
         this.nodePerLevels = new Array();
@@ -30,11 +30,11 @@ export default class Tree {
 
     getTreeScale() {
         //if total work done by the tree is smaller than 80% of the screen width, no scaling is needed
-        if ((this.svg.attr('width') * 0.8) > this.totalWorkDoneByTree) {
+        if ((this.svgWidth * 0.8) > this.totalWorkDoneByTree) {
             return 1;
         } else {
             //total work done by the tree in mode 3 should take 80% of the screen width 
-            return (this.svg.attr('width') * 0.8) / this.totalWorkDoneByTree;
+            return (this.svgWidth * 0.8) / this.totalWorkDoneByTree;
         }
     }
 
@@ -44,7 +44,7 @@ export default class Tree {
             var nodesTilCenter = this.nodePerLevels[this.noOfTreeLevels - 1].noOfNodes / 2;
             var spacesBetweenNodesTilCenter = (this.nodePerLevels[this.noOfTreeLevels - 1].noOfNodes - 1) / 2;
             var distanceFromMiddle = (nodesTilCenter * this.nodePerLevels[this.noOfTreeLevels - 1].workPerNode) + spacesBetweenNodesTilCenter * space;
-            if ((this.svg.attr('width') / 2) >= distanceFromMiddle) {
+            if ((this.svgWidth / 2) >= distanceFromMiddle) {
                 spaceSet = true;
             }
             space--;

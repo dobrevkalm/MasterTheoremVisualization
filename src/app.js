@@ -26,7 +26,7 @@ for (var i = 0; i < btns.length; i++) {
 }
 
 function drawTree(tree, mode) {
-    var svgHeight = svg.attr('height'),
+    var svgHeight = svg.attr('height') * 0.8,
         svgMiddleX = svg.attr('width') / 2,
         noOfTreeLevels = tree.noOfTreeLevels,
         spaceBetweenNodeLevels = 20,
@@ -35,7 +35,7 @@ function drawTree(tree, mode) {
     // calculate nodeHeight in a way that there is 30px between levels and node height takes the rest of the window space
     // if calculated hight is bigger than 35 set on defualt height of 35 px
         nodeHeight = Math.min((svgHeight - ((noOfTreeLevels + 1) * spaceBetweenNodeLevels)) / noOfTreeLevels, 35),
-        y = spaceBetweenNodeLevels;
+        y = spaceBetweenNodeLevels + 0.1 * svg.attr('height');
     // we're in mode 1 or mode 2
     if (mode === 1 || mode === 2) {
         for (var i = 0; i < tree.nodePerLevels.length; i++) {
@@ -149,7 +149,7 @@ function drawRecuerenceRelationTree(mode) {
     var params = getParameters();
 
     if (!params) return;
-    var tree = new Tree(svg, params.N, params.a, params.b, params.c);
+    var tree = new Tree(svg.attr('width'), params.N, params.a, params.b, params.c);
     console.log(tree);
     drawTree(tree, mode);
 }
