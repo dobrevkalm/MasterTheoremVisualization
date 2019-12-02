@@ -26,16 +26,16 @@ for (var i = 0; i < btns.length; i++) {
 }
 
 function drawTree(tree, mode) {
-    var svgHeight = svg.attr('height');
-    var svgMiddleX = svg.attr('width') / 2;
-    var noOfTreeLevels = tree.noOfTreeLevels;
-    var spaceBetweenNodeLevels = 20;
-    var colorVar = 0.5;
-    var colorGradient = 0.5 / noOfTreeLevels;
+    var svgHeight = svg.attr('height'),
+        svgMiddleX = svg.attr('width') / 2,
+        noOfTreeLevels = tree.noOfTreeLevels,
+        spaceBetweenNodeLevels = 20,
+        colorVar = 0.5,
+        colorGradient = 0.5 / noOfTreeLevels,
     // calculate nodeHeight in a way that there is 30px between levels and node height takes the rest of the window space
     // if calculated hight is bigger than 35 set on defualt height of 35 px
-    var nodeHeight = Math.min((svgHeight - ((noOfTreeLevels + 1) * spaceBetweenNodeLevels)) / noOfTreeLevels, 35);
-    var y = spaceBetweenNodeLevels;
+        nodeHeight = Math.min((svgHeight - ((noOfTreeLevels + 1) * spaceBetweenNodeLevels)) / noOfTreeLevels, 35),
+        y = spaceBetweenNodeLevels;
     // we're in mode 1 or mode 2
     if (mode === 1 || mode === 2) {
         for (var i = 0; i < tree.nodePerLevels.length; i++) {
@@ -71,9 +71,10 @@ function drawTree(tree, mode) {
         // mode 3 total starts to be drawn 10% to the left from the window beginning
         var x = svgMiddleX - ((tree.totalWorkDoneByTree * tree.scale) / 2);
         for (var i = 0; i < tree.nodePerLevels.length; i++) {
-            var treeLvl = tree.nodePerLevels[i];
-            var color = d3.interpolateBlues(colorVar);
-            var workDonePerLevelScaled = treeLvl.totalWorkPerLevel * tree.scale;
+            var treeLvl = tree.nodePerLevels[i],
+                color = d3.interpolateBlues(colorVar),
+                workDonePerLevelScaled = treeLvl.totalWorkPerLevel * tree.scale;
+                
             drawNode(x, y, nodeHeight, color, workDonePerLevelScaled);
             // adjust x for the next node
             x += workDonePerLevelScaled;
