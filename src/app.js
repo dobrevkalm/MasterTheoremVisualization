@@ -9,11 +9,8 @@ const svg = d3.select('svg')
 document.addEventListener('keypress', e => {
     var key = e.which || e.keyCode;
     if (key == 13) {
-        var current = document.getElementsByClassName("active");
-        if (current.length > 0) {
-            current[0].className = current[0].className.replace("active", "");
-        }
-        document.getElementById("mode1").className = "active";
+        document.getElementsByClassName("active")[0].className = "";
+        document.getElementById("mode").className = "active";
         drawRecuerenceRelationTree(1);
     }
 });
@@ -22,10 +19,7 @@ document.addEventListener('keypress', e => {
 var btns = document.getElementsByTagName("button");
 for (var i = 0; i < btns.length; i++) {
     btns[i].addEventListener("click", function () {
-        var current = document.getElementsByClassName("active");
-        if (current.length > 0) {
-            current[0].className = current[0].className.replace("active", "");
-        }
+        document.getElementsByClassName("active")[0].className = "";
         this.className = "active";
         drawRecuerenceRelationTree(parseInt(this.value));
     });
