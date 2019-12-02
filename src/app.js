@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
             drawRecuerenceRelationTree(1);
         }
     });
+    
     //add button listeners
     var btns = document.getElementsByTagName("button");
     for (var i = 0; i < btns.length; i++) {
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    //Represents Node objects at given tree level
+    //Represents the tree level
     class TreeLvl {
         constructor(lvl, value, noOfNodes, workPerNode) {
             this.lvl = lvl;
@@ -37,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
             this.noOfNodes = noOfNodes;
             this.workPerNode = workPerNode;
             this.totalWorkPerLevel = this.calculateTotalWorkPerLvl();
+            // calculates the position of the first node for the level
             this.calculateX1 = function (middleX, space) {
                 var nodesTilCenter = this.noOfNodes / 2;
                 var spacesBetweenNodesTilCenter = (this.noOfNodes - 1) / 2;
@@ -44,6 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return middleX - distanceFromMiddle;
             };
         }
+
         calculateTotalWorkPerLvl() {
             return this.noOfNodes * this.workPerNode;
         }
@@ -52,9 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     class Tree {
         constructor(n, a, b, c) {
             this.noOfTreeLevels = getNoOfTreeLevels(n, b);
-            if (this.noOfTreeLevels === -1) {
-                return;
-            }
+            if (this.noOfTreeLevels === -1) return;
             this.nodePerLevels = new Array();
             this.createTree(n, a, b, c);
             //scale used for mode 3
@@ -62,6 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
             //calculate appropriate space for nodes
             this.calculateSpace(10);
         }
+
         createTree(n, a, b, c) {
             var totalWork = 0;
             for (var lvl = 0; lvl < this.noOfTreeLevels; lvl++) {
@@ -76,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             this.totalWorkDoneByTree = totalWork;
         }
+
         getTreeScale() {
             //if total work done by the tree is smaller than 80% of the screen width, no scaling is needed
             if ((svg.attr('width') * 0.8) > this.totalWorkDoneByTree) {
@@ -85,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return (svg.attr('width') * 0.8) / this.totalWorkDoneByTree;
             }
         }
+
         calculateSpace(space) {
             var spaceSet = false;
             while (space > 1 && !spaceSet) {
@@ -97,7 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 space--;
             }
             this.space = space;
-
         }
     }
 
@@ -112,16 +115,20 @@ document.addEventListener("DOMContentLoaded", () => {
         // if calculated hight is bigger than 35 set on defualt height of 35 px
         var nodeHeight = Math.min((svgHeight - ((noOfTreeLevels + 1) * spaceBetweenNodeLevels)) / noOfTreeLevels, 35);
         var y = spaceBetweenNodeLevels;
-        if (mode === 1 || mode === 2) { //we're in mode 1 or mode 2
+        // we're in mode 1 or mode 2
+        if (mode === 1 || mode === 2) {
             for (var i = 0; i < tree.nodePerLevels.length; i++) {
                 var treeLvl = tree.nodePerLevels[i];
+                // position of the first node
+                var x;
                 if (mode === 1) {
-                    var x = treeLvl.calculateX1(svgMiddleX, tree.space);
+                    x = treeLvl.calculateX1(svgMiddleX, tree.space);
                 } else {
                     //there should be no space between nodes
-                    var x = treeLvl.calculateX1(svgMiddleX, 0);
+                    x = treeLvl.calculateX1(svgMiddleX, 0);
                 }
                 var color = d3.interpolateBlues(colorVar);
+                // draw nodes for the level
                 for (var nodeNo = 0; nodeNo < treeLvl.noOfNodes; nodeNo++) {
                     drawNode(x, y, nodeHeight, color, treeLvl.workPerNode);
                     // adjust x for the next node
@@ -136,7 +143,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 // adjust color
                 colorVar += colorGradient;
             }
-        } else { // we got to mode 3
+        } else {
+            // we got to mode 3
             //get middle of height of the svg image
             y = svgHeight / 2 - nodeHeight;
             // mode 3 total starts to be drawn 10% to the left from the window beginning
@@ -251,5 +259,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
     //draw defualt tree
     drawRecuerenceRelationTree(1);
-
 });
