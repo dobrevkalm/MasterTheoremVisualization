@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function(event) {
+document.addEventListener("DOMContentLoaded", () => {
     const svg = d3.select('svg')
         .attr('width', window.innerWidth)
         .attr('height', window.innerHeight - 65)
@@ -7,9 +7,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
     // allow drowing with enter press
     document.addEventListener('keypress', e => {
         var key = e.which || e.keyCode;
-        if(key == 13) {
+        if (key == 13) {
             var current = document.getElementsByClassName("active");
-            if(current.length > 0) {
+            if (current.length > 0) {
                 current[0].className = current[0].className.replace("active", "");
             }
             document.getElementById("mode1").className = "active";
@@ -19,15 +19,15 @@ document.addEventListener("DOMContentLoaded", function(event) {
     //add button listeners
     var btns = document.getElementsByTagName("button");
     for (var i = 0; i < btns.length; i++) {
-        btns[i].addEventListener("click", function() {
-        var current = document.getElementsByClassName("active");
-        if(current.length > 0) {
-            current[0].className = current[0].className.replace("active", "");
-        }
-        this.className = "active";
-        drawRecuerenceRelationTree(parseInt(this.value));
+        btns[i].addEventListener("click", function () {
+            var current = document.getElementsByClassName("active");
+            if (current.length > 0) {
+                current[0].className = current[0].className.replace("active", "");
+            }
+            this.className = "active";
+            drawRecuerenceRelationTree(parseInt(this.value));
         });
-    }  
+    }
 
     //Represents Node objects at given tree level
     class TreeLvl {
@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
             this.calculateX1 = function (middleX, space) {
                 var nodesTilCenter = this.noOfNodes / 2;
                 var spacesBetweenNodesTilCenter = (this.noOfNodes - 1) / 2;
-                var distanceFromMiddle = (nodesTilCenter * this.workPerNode) + (spacesBetweenNodesTilCenter * space); 
+                var distanceFromMiddle = (nodesTilCenter * this.workPerNode) + (spacesBetweenNodesTilCenter * space);
                 return middleX - distanceFromMiddle;
             };
         }
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     class Tree {
         constructor(n, a, b, c) {
             this.noOfTreeLevels = getNoOfTreeLevels(n, b);
-            if(this.noOfTreeLevels === -1) {
+            if (this.noOfTreeLevels === -1) {
                 return;
             }
             this.nodePerLevels = new Array();
@@ -63,68 +63,69 @@ document.addEventListener("DOMContentLoaded", function(event) {
             this.calculateSpace(10);
         }
         createTree(n, a, b, c) {
-            var totalWork= 0;
-            for(var lvl=0; lvl<this.noOfTreeLevels; lvl++) {
+            var totalWork = 0;
+            for (var lvl = 0; lvl < this.noOfTreeLevels; lvl++) {
                 //node value
-                var nodeValue = n/(Math.pow(b,lvl));
+                var nodeValue = n / (Math.pow(b, lvl));
                 //number of nodes in current level
-                var noOfNodes = Math.pow(a,lvl);
+                var noOfNodes = Math.pow(a, lvl);
                 //work per node
                 var workPerNode = Math.pow(nodeValue, c);
                 this.nodePerLevels[lvl] = new TreeLvl(lvl, nodeValue, noOfNodes, workPerNode);
-                totalWork += noOfNodes*workPerNode;
+                totalWork += noOfNodes * workPerNode;
             }
             this.totalWorkDoneByTree = totalWork;
         }
         getTreeScale() {
             //if total work done by the tree is smaller than 80% of the screen width, no scaling is needed
-            if((svg.attr('width') * 0.8) > this.totalWorkDoneByTree) {
+            if ((svg.attr('width') * 0.8) > this.totalWorkDoneByTree) {
                 return 1;
             } else {
-            //total work done by the tree in mode 3 should take 80% of the screen width 
+                //total work done by the tree in mode 3 should take 80% of the screen width 
                 return (svg.attr('width') * 0.8) / this.totalWorkDoneByTree;
             }
         }
         calculateSpace(space) {
             var spaceSet = false;
-            while(space > 1 && !spaceSet) {
-                var nodesTilCenter = this.nodePerLevels[this.noOfTreeLevels-1].noOfNodes / 2;
-                var spacesBetweenNodesTilCenter = (this.nodePerLevels[this.noOfTreeLevels-1].noOfNodes - 1) / 2;
-                var distanceFromMiddle = (nodesTilCenter * this.nodePerLevels[this.noOfTreeLevels-1].workPerNode) + spacesBetweenNodesTilCenter * space; 
-                if ((svg.attr('width')/2) >= distanceFromMiddle) {
+            while (space > 1 && !spaceSet) {
+                var nodesTilCenter = this.nodePerLevels[this.noOfTreeLevels - 1].noOfNodes / 2;
+                var spacesBetweenNodesTilCenter = (this.nodePerLevels[this.noOfTreeLevels - 1].noOfNodes - 1) / 2;
+                var distanceFromMiddle = (nodesTilCenter * this.nodePerLevels[this.noOfTreeLevels - 1].workPerNode) + spacesBetweenNodesTilCenter * space;
+                if ((svg.attr('width') / 2) >= distanceFromMiddle) {
                     spaceSet = true;
                 }
                 space--;
             }
             this.space = space;
-            
+
         }
     }
 
     function drawTree(tree, mode) {
         var svgHeight = svg.attr('height');
-        var svgMiddleX = svg.attr('width')/2;
+        var svgMiddleX = svg.attr('width') / 2;
         var noOfTreeLevels = tree.noOfTreeLevels;
         var spaceBetweenNodeLevels = 20;
         var colorVar = 0.5;
-        var colorGradient = 0.5/noOfTreeLevels;
+        var colorGradient = 0.5 / noOfTreeLevels;
         // calculate nodeHeight in a way that there is 30px between levels and node height takes the rest of the window space
-        var nodeHeight = (svgHeight - ((noOfTreeLevels+1) * spaceBetweenNodeLevels))/noOfTreeLevels;
+        // if calculated hight is bigger than 35 set on defualt height of 35 px
+        var nodeHeight = Math.min((svgHeight - ((noOfTreeLevels + 1) * spaceBetweenNodeLevels)) / noOfTreeLevels, 35);
         var y = spaceBetweenNodeLevels;
-        if(mode === 1 || mode === 2) { //we're in mode 1 or mode 2
-            for(var i=0; i<tree.nodePerLevels.length; i++) {
+        if (mode === 1 || mode === 2) { //we're in mode 1 or mode 2
+            for (var i = 0; i < tree.nodePerLevels.length; i++) {
                 var treeLvl = tree.nodePerLevels[i];
-                if(mode === 1) {
+                if (mode === 1) {
                     var x = treeLvl.calculateX1(svgMiddleX, tree.space);
                 } else {
                     //there should be no space between nodes
                     var x = treeLvl.calculateX1(svgMiddleX, 0);
                 }
                 var color = d3.interpolateBlues(colorVar);
-                for(var nodeNo=0; nodeNo<treeLvl.noOfNodes; nodeNo++) {
+                for (var nodeNo = 0; nodeNo < treeLvl.noOfNodes; nodeNo++) {
                     drawNode(x, y, nodeHeight, color, treeLvl.workPerNode);
                     // adjust x for the next node
-                    if(mode === 1) {
+                    if (mode === 1) {
                         x += treeLvl.workPerNode + tree.space;
                     } else {
                         x += treeLvl.workPerNode;
@@ -137,10 +138,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
             }
         } else { // we got to mode 3
             //get middle of height of the svg image
-            y = svgHeight/2 - nodeHeight;
+            y = svgHeight / 2 - nodeHeight;
             // mode 3 total starts to be drawn 10% to the left from the window beginning
-            var x = svgMiddleX - ((tree.totalWorkDoneByTree * tree.scale)/2);
-            for(var i=0; i<tree.nodePerLevels.length; i++) {
+            var x = svgMiddleX - ((tree.totalWorkDoneByTree * tree.scale) / 2);
+            for (var i = 0; i < tree.nodePerLevels.length; i++) {
                 var treeLvl = tree.nodePerLevels[i];
                 var color = d3.interpolateBlues(colorVar);
                 var workDonePerLevelScaled = treeLvl.totalWorkPerLevel * tree.scale;
@@ -183,29 +184,29 @@ document.addEventListener("DOMContentLoaded", function(event) {
             "c": c
         }
 
-        for(var i in params) {
+        for (var i in params) {
             // make sure we have all parameters
-            if(isNaN(params[i])) {
+            if (isNaN(params[i])) {
                 alert("Missing parameter!");
-                document.getElementsByClassName('formula')[0].style.visibility  = "hidden";
+                document.getElementsByClassName('formula')[0].style.visibility = "hidden";
                 return;
             }
         }
 
         // if b is one then levels below are = to infinity
-        if(params.b < 2) {
+        if (params.b < 2) {
             alert("Parameter b can't be smaller than 2!");
-            document.getElementsByClassName('formula')[0].style.visibility  = "hidden";
+            document.getElementsByClassName('formula')[0].style.visibility = "hidden";
             return;
         }
 
         var n = params.N;
-        while(n>1) {
+        while (n > 1) {
             n /= params.b;
         }
-        if(n !== 1) {
+        if (n !== 1) {
             alert("Parameter N must be a power of parameter b!");
-            document.getElementsByClassName('formula')[0].style.visibility  = "hidden";
+            document.getElementsByClassName('formula')[0].style.visibility = "hidden";
             return;
         }
 
@@ -216,23 +217,12 @@ document.addEventListener("DOMContentLoaded", function(event) {
     }
 
     function displayFormula(n, a, b, c) {
-        document.getElementsByClassName('formula')[0].style.visibility  = "visible";
-        var nEl = document.getElementsByClassName('n');
-        var aEl = document.getElementsByClassName('a');
-        var bEl = document.getElementsByClassName('b');
-        var cEl = document.getElementsByClassName('c');
-        for(var i=0; i<nEl.length; i++) {
-            nEl[i].innerHTML = n;
-        }
-        for(var i=0; i<aEl.length; i++) {
-            aEl[i].innerHTML = a;
-        }
-        for(var i=0; i<bEl.length; i++) {
-            bEl[i].innerHTML = b;
-        }
-        for(var i=0; i<cEl.length; i++) {
-            cEl[i].innerHTML = c;
-        }
+        document.getElementById('formula').style.visibility = "visible";
+        document.getElementById('fa').innerHTML = a;
+        document.getElementById('fb').innerHTML = b;
+        document.getElementById('fc').innerHTML = c;
+        var nEl = document.getElementsByClassName('fn');
+        Object.keys(nEl).forEach(e => nEl[e].innerHTML = n);
     }
 
     function drawRecuerenceRelationTree(mode) {
@@ -240,15 +230,17 @@ document.addEventListener("DOMContentLoaded", function(event) {
         svg.html("");
 
         var params = getParameters();
+
+        if (!params) return;
         var tree = new Tree(params.N, params.a, params.b, params.c);
         console.log(tree);
         drawTree(tree, mode);
     }
 
     function getNoOfTreeLevels(n, b) {
-        if(!isNaN(n) && !isNaN(b) && n>0 && b>1) {
+        if (!isNaN(n) && !isNaN(b) && n > 0 && b > 1) {
             var levels = 0;
-            while(n>=1) {
+            while (n >= 1) {
                 n /= b;
                 levels++;
             }
@@ -256,7 +248,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         }
         return -1;
     }
-    
+
     //draw defualt tree
     drawRecuerenceRelationTree(1);
 
