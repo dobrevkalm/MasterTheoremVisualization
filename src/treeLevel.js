@@ -1,6 +1,6 @@
-export default class TreeLvl {
-    constructor(lvl, value, noOfNodes, workPerNode) {
-        this.lvl = lvl;
+export default class TreeLevel {
+    constructor(level, value, noOfNodes, workPerNode) {
+        this.level = level;
         this.value = value;
         this.noOfNodes = noOfNodes;
         this.workPerNode = workPerNode;

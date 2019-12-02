@@ -1,4 +1,4 @@
-import TreeLvl from './treeLvl.js';
+import TreeLevel from './treeLevel.js';
 
 export default class Tree {
     constructor(svg, n, a, b, c) {
@@ -22,7 +22,7 @@ export default class Tree {
             var noOfNodes = Math.pow(a, lvl);
             //work per node
             var workPerNode = Math.pow(nodeValue, c);
-            this.nodePerLevels[lvl] = new TreeLvl(lvl, nodeValue, noOfNodes, workPerNode);
+            this.nodePerLevels[lvl] = new TreeLevel(lvl, nodeValue, noOfNodes, workPerNode);
             totalWork += noOfNodes * workPerNode;
         }
         this.totalWorkDoneByTree = totalWork;

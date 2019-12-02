@@ -107,41 +107,31 @@ function drawNode(x, y, height, color, width) {
 
 // get the input parameters
 function getParameters() {
-    var N = parseInt(document.getElementById('N').value),
-        a = parseInt(document.getElementById('a').value),
-        b = parseInt(document.getElementById('b').value),
-        c = parseInt(document.getElementById('c').value);
-
     var params = {
-        "N": N,
-        "a": a,
-        "b": b,
-        "c": c
+        "N": parseInt(document.getElementById('N').value),
+        "a": parseInt(document.getElementById('a').value),
+        "b": parseInt(document.getElementById('b').value),
+        "c": parseInt(document.getElementById('c').value)
     }
 
     for (var i in params) {
-        // make sure we have all parameters
         if (isNaN(params[i])) {
+            document.getElementById('formula').style.visibility = "hidden";
             alert("Missing parameter!");
-            document.getElementsByClassName('formula')[0].style.visibility = "hidden";
             return;
         }
     }
 
     // if b is one then levels below are = to infinity
     if (params.b < 2) {
+        document.getElementById('formula').style.visibility = "hidden";
         alert("Parameter b can't be smaller than 2!");
-        document.getElementsByClassName('formula')[0].style.visibility = "hidden";
         return;
     }
 
-    var n = params.N;
-    while (n > 1) {
-        n /= params.b;
-    }
-    if (n !== 1) {
+    if (Math.log(params.N)/Math.log(params.b) % 1 !== 0) {
+        document.getElementById('formula').style.visibility = "hidden";
         alert("Parameter N must be a power of parameter b!");
-        document.getElementsByClassName('formula')[0].style.visibility = "hidden";
         return;
     }
 
@@ -152,12 +142,9 @@ function getParameters() {
 }
 
 function displayFormula(n, a, b, c) {
-    document.getElementById('formula').style.visibility = "visible";
-    document.getElementById('fa').innerHTML = a;
-    document.getElementById('fb').innerHTML = b;
-    document.getElementById('fc').innerHTML = c;
-    var nEl = document.getElementsByClassName('fn');
-    Object.keys(nEl).forEach(e => nEl[e].innerHTML = n);
+    var formula = document.getElementById('formula');
+    formula.style.visibility = "visible";
+    formula.innerHTML = `T(${n}) = ${a}T(${n}/${b}) + ${n}<sup>${c}</sup>`;
 }
 
 function drawRecuerenceRelationTree(mode) {
