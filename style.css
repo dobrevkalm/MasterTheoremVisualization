@@ -1,20 +1,24 @@
 body {
-    background-color: rgba(160, 160, 160, 0.75);
-}
-
-#inputContainer {
-    display: flex;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    vertical-align: baseline;
 }
 
 #inputContainer > * {
-    display: block;
     font-family: 'Courier New', Courier, monospace;
     font-size: larger;
     font-weight: bolder;
-    padding: 15px;
 }
 
-.input > input {
+.input {
+    padding: 7 10;
+    display: flex;
+    justify-content: space-between;
+}
+
+.input > .var > input {
     margin-left: 5px;
     margin-right: 15px;
     padding: 5px 0px;
@@ -27,9 +31,8 @@ body {
     text-align: center;
 }
 
-#inputContainer > * > button {
-    background-color: beige;
-    border: none;
+button {
+    border: 1px solid #ccc;
     border-radius: 5px;
     padding: 5px 30px;
     text-align: center;
@@ -37,12 +40,21 @@ body {
     font-family: 'Courier New', Courier, monospace;
     font-size: 20px;
     font-weight: bolder;
+    background-color: white;
+}
+
+.formula {
+    visibility: hidden;
 }
 
 #inputContainer > * > button:hover {
-    background-color: bisque;
+    border-bottom: 5px solid rgb(24, 100, 170);
 }
 
 .svg_container {
-    background-color: beige;
+    background-color: white;
+}
+
+.active {
+    border-bottom: 5px solid rgb(24, 100, 170) !important;
 }

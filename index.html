@@ -1,21 +1,31 @@
 <html>
     <head>
         <link rel='stylesheet' href='style.css'>
-        <title>Try D3</title>
+        <title>Master Theorem</title>
     </head>
 
     <body>
-        <div id="inputContainer">
+        <div id='inputContainer'>
             <div class='input'>
-                N<input type="text" id="N" size="5" value="">
-                a<input type="text" id="a" size="3" value="">
-                b<input type="text" id="b" size="3" value="">
-                c<input type="text" id="c" size="3" value="">
-                <button onclick="drawRecuerenceRelationTree(1)">Draw</button>
+                <span class="var">
+                    N<input type="text" id="N" size="5" value="64">
+                    a<input type="text" id="a" size="3" value="2">
+                    b<input type="text" id="b" size="3" value="2">
+                    c<input type="text" id="c" size="3" value="1">
+                </span>
+                <span class="formula">
+                    T(<span class="n"></span>) = <span class="a"></span>T(<span class="n"></span>/<span class="b"></span>) + <span class="n"></span><sup><span class="c"></span></sup>
+                </span>
+                <span class="btns">
+                    <button id="mode1" class ="active" value="1">Mode 1</button>
+                    <button id="mode2" class ="" value="2">Mode 2</button>
+                    <button id="mode3" class ="" value="3">Mode 3</button>
+                </span>
             </div>
         </div>
         <svg></svg>
         <script src='http://d3js.org/d3.v5.min.js'></script>
+        <script src='https://d3js.org/d3-scale-chromatic.v1.min.js'></script>
         <script src='app.js'></script>
     </body>
 </html>

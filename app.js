@@ -1,171 +1,263 @@
-const svg = d3.select('svg')
-    .attr('width', window.innerWidth)
-    .attr('height', window.innerHeight)
-    .attr('class', 'svg_container');
+document.addEventListener("DOMContentLoaded", function(event) {
+    const svg = d3.select('svg')
+        .attr('width', window.innerWidth)
+        .attr('height', window.innerHeight - 65)
+        .attr('class', 'svg_container');
 
-// allow drowing with enter press
-(function listenForEnterPress() {
+    // allow drowing with enter press
     document.addEventListener('keypress', e => {
-        if(e.which == 13) drawRecuerenceRelationTree(1);
-})})();
-
-// will brighten up given hex color with given percent
-function lightenColor(color, percent) {
-    var num = parseInt(color.replace("#", ""), 16),
-        amt = Math.round(2.55 * percent),
-        R = (num >> 16) + amt,
-        B = (num >> 8 & 0x00FF) + amt,
-        G = (num & 0x0000FF) + amt;
-
-    return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (B<255?B<1?0:B:255)*0x100 + (G<255?G<1?0:G:255)).toString(16).slice(1);
-};
-
-// root position from top
-const rootY = 30,
-// node height
-    nodeH = 30,
-// distane between tree levels
-    levelDist = 20,
-// this will be used to calculate the distance between the nodes
-    nodeGap = 1.2;
-
-// node color
-var defaultColor = "#000050";
-
-// has mode 2 been enabled
-var mode2 = true;
-
-// create a single node
-function createNode(x, y1, y2, color, width) {
-    return svg.append('line')
-        // position on the svg
-        .attr('x1', x)
-        .attr('x2', x)
-        // y1 and y2 are the height of the node
-        .attr('y1', y1)
-        .attr('y2', y2)
-        // color of the node
-        .attr('stroke', color)
-        // the width of the node
-        .attr('stroke-width', width);
-}
-
-// get the input parameters
-function getParameters() {
-    var N = parseInt(document.getElementById('N').value),
-        a = parseInt(document.getElementById('a').value),
-        b = parseInt(document.getElementById('b').value),
-        // not yet used
-        c = parseInt(document.getElementById('c').value);
-
-    var params = {
-        "N": N,
-        "a": a,
-        "b": b,
-        "c": c
-    }
-
-    for(var i in params) {
-        // make sure we have all parameters
-        if(isNaN(params[i])) {
-            alert("Missing parameter!");
-            return;
-        }
-        // if b is one then levels below are = to infinity
-        if(i === "b" && params[i] < 2) {
-            alert("Parameter b can't be smaller than 2!");
-            return;
-        }
-    }
-
-    return params;
-}
-
-function drawRecuerenceRelationTree(mode) {
-    var params = getParameters();
-
-    // clear the SVG
-    svg.html("");
-
-    // draw the root
-    var root = createNode((svg.attr('width'))/2, rootY, rootY + nodeH, defaultColor, params.N);
-    
-    // draw the tree nodes
-    drawTreeNodes(root, params, mode);
-
-    // enable mode 2
-    if(mode2) initMode2();
-}
-
-function drawTreeNodes(root, params, mode) {
-    // root for the current level
-    var currentRoot = root,
-    // current level
-        currentLevel = 1,
-    // color for the current level
-        nodeColor = defaultColor;
-    console.log("We start with root -> ", root);
-    // calculate the number of levels
-    var levels = Math.log(params.N) / Math.log(params.b),
-    // nodes at the root
-        nodes = params.a,
-    // distance between the level nodes
-        nodeDist = 0;
-    // only mode 1 has distance between the nodes
-    if(mode == 1) nodeDist = Math.pow(nodeGap, levels) * params.a;
-    console.log("levels -> ", levels);
-    // draw all the levels
-    while (currentLevel < levels) {
-        // change node color
-        nodeColor = lightenColor(nodeColor, currentLevel*(20/levels));
-        // the width of the node
-        var nodeW = currentRoot.attr('stroke-width') / params.b,
-        // node Y position
-            nodeY = parseInt(currentRoot.attr('y2')) + levelDist,
-        // node X position
-            nodeX = svg.attr('width')/2 - ((nodes-1)*nodeW)/2,
-            currNode = 0;
-        // keep into account the distance between the nodes for mode 1
-        if(mode == 1) nodeX -= ((nodes-1)*nodeDist)/2;
-        console.log("Doing level ", currentLevel, " it has ", nodes, " nodes with nodeWidth: ", nodeW);
-        // draw all the nodes per level
-        while (currNode < nodes) {
-            var node = createNode(nodeX, nodeY, nodeY + nodeH, nodeColor, nodeW);
-            if (currNode == 0) currentRoot = node;
-            nodeX += nodeW + nodeDist;
-            currNode++;
-        }
-        currentLevel++;
-        nodes *= params.a;
-        nodeDist /= nodeGap;
-    }
-}
-
-// creates the button for mode 2
-function initMode2(){
-    // set mode2 to false
-    mode2 = false;
-    // container needed to avoid redundant styling
-    var btnContainer = document.createElement('div'),
-        btn = document.createElement('button');
-    // set btn attributes
-    btn.innerText = "Mode 2";
-    btn.id = "m2";
-    // to draw mode 2 on click
-    btn.addEventListener('click', () => {
-        if(btn.innerText === "Mode 2") drawMode2();
-        else {
+        var key = e.which || e.keyCode;
+        if(key == 13) {
+            var current = document.getElementsByClassName("active");
+            if(current.length > 0) {
+                current[0].className = current[0].className.replace("active", "");
+            }
+            document.getElementById("mode1").className = "active";
             drawRecuerenceRelationTree(1);
-            btn.innerText = "Mode 2";
         }
     });
-    // append the button
-    btnContainer.appendChild(btn);
-    document.getElementById('inputContainer').appendChild(btnContainer);
-};
+    //add button listeners
+    var btns = document.getElementsByTagName("button");
+    for (var i = 0; i < btns.length; i++) {
+        btns[i].addEventListener("click", function() {
+        var current = document.getElementsByClassName("active");
+        if(current.length > 0) {
+            current[0].className = current[0].className.replace("active", "");
+        }
+        this.className = "active";
+        drawRecuerenceRelationTree(parseInt(this.value));
+        });
+    }  
 
-function drawMode2() {
-    var btn = document.getElementById('m2');
-    btn.innerText = "Mode 1";
-    drawRecuerenceRelationTree(2);
-}
+    //Represents Node objects at given tree level
+    class TreeLvl {
+        constructor(lvl, value, noOfNodes, workPerNode) {
+            this.lvl = lvl;
+            this.value = value;
+            this.noOfNodes = noOfNodes;
+            this.workPerNode = workPerNode;
+            this.totalWorkPerLevel = this.calculateTotalWorkPerLvl();
+            this.calculateX1 = function (middleX, space) {
+                var nodesTilCenter = this.noOfNodes / 2;
+                var spacesBetweenNodesTilCenter = (this.noOfNodes - 1) / 2;
+                var distanceFromMiddle = (nodesTilCenter * this.workPerNode) + (spacesBetweenNodesTilCenter * space); 
+                return middleX - distanceFromMiddle;
+            };
+        }
+        calculateTotalWorkPerLvl() {
+            return this.noOfNodes * this.workPerNode;
+        }
+    }
+
+    class Tree {
+        constructor(n, a, b, c) {
+            this.noOfTreeLevels = getNoOfTreeLevels(n, b);
+            if(this.noOfTreeLevels === -1) {
+                return;
+            }
+            this.nodePerLevels = new Array();
+            this.createTree(n, a, b, c);
+            //scale used for mode 3
+            this.scale = this.getTreeScale();
+            //calculate appropriate space for nodes
+            this.calculateSpace(10);
+        }
+        createTree(n, a, b, c) {
+            var totalWork= 0;
+            for(var lvl=0; lvl<this.noOfTreeLevels; lvl++) {
+                //node value
+                var nodeValue = n/(Math.pow(b,lvl));
+                //number of nodes in current level
+                var noOfNodes = Math.pow(a,lvl);
+                //work per node
+                var workPerNode = Math.pow(nodeValue, c);
+                this.nodePerLevels[lvl] = new TreeLvl(lvl, nodeValue, noOfNodes, workPerNode);
+                totalWork += noOfNodes*workPerNode;
+            }
+            this.totalWorkDoneByTree = totalWork;
+        }
+        getTreeScale() {
+            //if total work done by the tree is smaller than 80% of the screen width, no scaling is needed
+            if((svg.attr('width') * 0.8) > this.totalWorkDoneByTree) {
+                return 1;
+            } else {
+            //total work done by the tree in mode 3 should take 80% of the screen width 
+                return (svg.attr('width') * 0.8) / this.totalWorkDoneByTree;
+            }
+        }
+        calculateSpace(space) {
+            var spaceSet = false;
+            while(space > 1 && !spaceSet) {
+                var nodesTilCenter = this.nodePerLevels[this.noOfTreeLevels-1].noOfNodes / 2;
+                var spacesBetweenNodesTilCenter = (this.nodePerLevels[this.noOfTreeLevels-1].noOfNodes - 1) / 2;
+                var distanceFromMiddle = (nodesTilCenter * this.nodePerLevels[this.noOfTreeLevels-1].workPerNode) + spacesBetweenNodesTilCenter * space; 
+                if ((svg.attr('width')/2) >= distanceFromMiddle) {
+                    spaceSet = true;
+                }
+                space--;
+            }
+            this.space = space;
+            
+        }
+    }
+
+    function drawTree(tree, mode) {
+        var svgHeight = svg.attr('height');
+        var svgMiddleX = svg.attr('width')/2;
+        var noOfTreeLevels = tree.noOfTreeLevels;
+        var spaceBetweenNodeLevels = 20;
+        var colorVar = 0.5;
+        var colorGradient = 0.5/noOfTreeLevels;
+        // calculate nodeHeight in a way that there is 30px between levels and node height takes the rest of the window space
+        var nodeHeight = (svgHeight - ((noOfTreeLevels+1) * spaceBetweenNodeLevels))/noOfTreeLevels;
+        var y = spaceBetweenNodeLevels;
+        if(mode === 1 || mode === 2) { //we're in mode 1 or mode 2
+            for(var i=0; i<tree.nodePerLevels.length; i++) {
+                var treeLvl = tree.nodePerLevels[i];
+                if(mode === 1) {
+                    var x = treeLvl.calculateX1(svgMiddleX, tree.space);
+                } else {
+                    //there should be no space between nodes
+                    var x = treeLvl.calculateX1(svgMiddleX, 0);
+                }
+                var color = d3.interpolateBlues(colorVar);
+                for(var nodeNo=0; nodeNo<treeLvl.noOfNodes; nodeNo++) {
+                    drawNode(x, y, nodeHeight, color, treeLvl.workPerNode);
+                    // adjust x for the next node
+                    if(mode === 1) {
+                        x += treeLvl.workPerNode + tree.space;
+                    } else {
+                        x += treeLvl.workPerNode;
+                    }
+                }
+                // adjust y for the next level of nodes
+                y += nodeHeight + spaceBetweenNodeLevels;
+                // adjust color
+                colorVar += colorGradient;
+            }
+        } else { // we got to mode 3
+            //get middle of height of the svg image
+            y = svgHeight/2 - nodeHeight;
+            // mode 3 total starts to be drawn 10% to the left from the window beginning
+            var x = svgMiddleX - ((tree.totalWorkDoneByTree * tree.scale)/2);
+            for(var i=0; i<tree.nodePerLevels.length; i++) {
+                var treeLvl = tree.nodePerLevels[i];
+                var color = d3.interpolateBlues(colorVar);
+                var workDonePerLevelScaled = treeLvl.totalWorkPerLevel * tree.scale;
+                drawNode(x, y, nodeHeight, color, workDonePerLevelScaled);
+                // adjust x for the next node
+                x += workDonePerLevelScaled;
+                // adjust color
+                colorVar += colorGradient;
+            }
+        }
+
+    }
+
+    // create a single node
+    function drawNode(x, y, height, color, width) {
+        return svg.append('rect')
+            // position on the svg
+            .attr('x', x)
+            // y is the y position of rectangle
+            .attr('y', y)
+            // the width of the node
+            .attr('width', width)
+            // height of the node
+            .attr('height', height)
+            // color of the node
+            .attr('fill', color);
+    }
+
+    // get the input parameters
+    function getParameters() {
+        var N = parseInt(document.getElementById('N').value),
+            a = parseInt(document.getElementById('a').value),
+            b = parseInt(document.getElementById('b').value),
+            c = parseInt(document.getElementById('c').value);
+
+        var params = {
+            "N": N,
+            "a": a,
+            "b": b,
+            "c": c
+        }
+
+        for(var i in params) {
+            // make sure we have all parameters
+            if(isNaN(params[i])) {
+                alert("Missing parameter!");
+                document.getElementsByClassName('formula')[0].style.visibility  = "hidden";
+                return;
+            }
+        }
+
+        // if b is one then levels below are = to infinity
+        if(params.b < 2) {
+            alert("Parameter b can't be smaller than 2!");
+            document.getElementsByClassName('formula')[0].style.visibility  = "hidden";
+            return;
+        }
+
+        var n = params.N;
+        while(n>1) {
+            n /= params.b;
+        }
+        if(n !== 1) {
+            alert("Parameter N must be a power of parameter b!");
+            document.getElementsByClassName('formula')[0].style.visibility  = "hidden";
+            return;
+        }
+
+        //display the formula
+        displayFormula(params.N, params.a, params.b, params.c);
+
+        return params;
+    }
+
+    function displayFormula(n, a, b, c) {
+        document.getElementsByClassName('formula')[0].style.visibility  = "visible";
+        var nEl = document.getElementsByClassName('n');
+        var aEl = document.getElementsByClassName('a');
+        var bEl = document.getElementsByClassName('b');
+        var cEl = document.getElementsByClassName('c');
+        for(var i=0; i<nEl.length; i++) {
+            nEl[i].innerHTML = n;
+        }
+        for(var i=0; i<aEl.length; i++) {
+            aEl[i].innerHTML = a;
+        }
+        for(var i=0; i<bEl.length; i++) {
+            bEl[i].innerHTML = b;
+        }
+        for(var i=0; i<cEl.length; i++) {
+            cEl[i].innerHTML = c;
+        }
+    }
+
+    function drawRecuerenceRelationTree(mode) {
+        // clear the SVG
+        svg.html("");
+
+        var params = getParameters();
+        var tree = new Tree(params.N, params.a, params.b, params.c);
+        console.log(tree);
+        drawTree(tree, mode);
+    }
+
+    function getNoOfTreeLevels(n, b) {
+        if(!isNaN(n) && !isNaN(b) && n>0 && b>1) {
+            var levels = 0;
+            while(n>=1) {
+                n /= b;
+                levels++;
+            }
+            return levels;
+        }
+        return -1;
+    }
+    
+    //draw defualt tree
+    drawRecuerenceRelationTree(1);
+
+});
