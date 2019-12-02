@@ -10,7 +10,7 @@ document.addEventListener('keypress', e => {
     var key = e.which || e.keyCode;
     if (key == 13) {
         document.getElementsByClassName("active")[0].className = "";
-        document.getElementById("mode").className = "active";
+        document.getElementById("mode1").className = "active";
         drawRecuerenceRelationTree(1);
     }
 });
@@ -74,7 +74,7 @@ function drawTree(tree, mode) {
             var treeLvl = tree.nodePerLevels[i],
                 color = d3.interpolateBlues(colorVar),
                 workDonePerLevelScaled = treeLvl.totalWorkPerLevel * tree.scale;
-                
+
             drawNode(x, y, nodeHeight, color, workDonePerLevelScaled);
             // adjust x for the next node
             x += workDonePerLevelScaled;
