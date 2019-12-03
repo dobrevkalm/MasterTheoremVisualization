@@ -8,7 +8,7 @@ export default class Tree {
         this.nodePerLevels = new Array();
         this.createTree(n, a, b, c);
         //scale used for mode 3
-        this.scale = this.getTreeScale();
+        this.getTreeScale();
         //calculate appropriate space for nodes
         this.calculateSpace(10);
     }
@@ -31,10 +31,10 @@ export default class Tree {
     getTreeScale() {
         //if total work done by the tree is smaller than 80% of the screen width, no scaling is needed
         if ((this.svgWidth * 0.8) > this.totalWorkDoneByTree) {
-            return 1;
+            this.scale = 1;
         } else {
             //total work done by the tree in mode 3 should take 80% of the screen width 
-            return (this.svgWidth * 0.8) / this.totalWorkDoneByTree;
+            this.scale = (this.svgWidth * 0.8) / this.totalWorkDoneByTree;
         }
     }
 

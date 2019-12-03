@@ -4,7 +4,7 @@ export default class TreeLevel {
         this.value = value;
         this.noOfNodes = noOfNodes;
         this.workPerNode = workPerNode;
-        this.totalWorkPerLevel = this.calculateTotalWorkPerLvl();
+        this.calculateTotalWorkPerLvl();
         // calculates the position of the first node for the level
         this.calculateX1 = function (middleX, space) {
             var nodesTilCenter = this.noOfNodes / 2;
@@ -15,6 +15,6 @@ export default class TreeLevel {
     }
 
     calculateTotalWorkPerLvl() {
-        return this.noOfNodes * this.workPerNode;
+        this.totalWorkPerLevel = this.noOfNodes * this.workPerNode;
     }
 }
