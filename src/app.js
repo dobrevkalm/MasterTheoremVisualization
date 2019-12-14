@@ -123,6 +123,12 @@ function getParameters() {
         alert("Parameter b can't be smaller than 2!");
         return;
     }
+    
+    if (params.a < 1) {
+        document.getElementById('formula').style.visibility = "hidden";
+        alert("Parameter a can't be smaller than 1!");
+        return;
+    }
 
     if (Math.log(params.N)/Math.log(params.b) % 1 !== 0) {
         document.getElementById('formula').style.visibility = "hidden";
