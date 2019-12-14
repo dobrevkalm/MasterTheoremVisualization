@@ -32,7 +32,7 @@ function drawTree(tree, mode) {
         spaceBetweenNodeLevels = 20,
         colorVar = 0.5,
         colorGradient = 0.5 / noOfTreeLevels,
-    // calculate nodeHeight in a way that there is 30px between levels and node height takes the rest of the window space
+    // calculate nodeHeight in a way that there is 20px between levels and node height takes the rest of the window space
     // if calculated hight is bigger than 35 set on defualt height of 35 px
         nodeHeight = Math.min((svgHeight - ((noOfTreeLevels + 1) * spaceBetweenNodeLevels)) / noOfTreeLevels, 35),
         y = spaceBetweenNodeLevels + 0.1 * svg.attr('height');
